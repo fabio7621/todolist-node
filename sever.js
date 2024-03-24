@@ -28,20 +28,43 @@ const requestListener = (req, res) => {
     res.end();
   } else if (req.url == "/todos" && req.method == "POST") {
     req.on("end", () => {
-      const title = JSON.parse(body).title; //取到傳回來的內容
-      const todo = {
-        title: title,
-        id: uuidv4(),
-      };
-      todos.push(todo);
-      res.writeHead(200, headers);
-      res.write(
-        JSON.stringify({
-          status: "success",
-          data: todos,
-        })
-      );
-      res.end();
+      try {
+        const title = JSON.parse(body).title; //取到傳回來的內容
+        if (title != undefined) {
+          const todo = {
+            title: title,
+            id: uuidv4(),
+          };
+          todos.push(todo);
+          res.writeHead(200, headers);
+          res.write(
+            JSON.stringify({
+              status: "success",
+              data: todos,
+            })
+          );
+          res.end();
+        } else {
+          res.writeHead(400, headers);
+          res.write(
+            JSON.stringify({
+              status: "false",
+              message: "欄位未填寫正確",
+            })
+          );
+          res.end();
+        }
+      } catch (error) {
+        console.log(error, "程式錯誤");
+        res.writeHead(400, headers);
+        res.write(
+          JSON.stringify({
+            status: "false",
+            message: "欄位未填寫正確",
+          })
+        );
+        res.end();
+      }
     });
   } else if (req.method == "OPTIONS") {
     res.writeHead(200, headers);
