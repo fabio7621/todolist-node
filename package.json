@@ -1,5 +1,18 @@
 {
+  "name": "todolist",
+  "version": "1.0.0",
+  "main": "sever.js",
+
+  "scripts": {
+    "start": "node sever.js",
+    "test": "echo\"Error: no test specified\" && exit 1"
+  },
+  "author": "Fabio20",
+  "license":"ISC",
   "dependencies": {
     "uuid": "^9.0.1"
+  },
+  "engines": {
+    "node": "20.x"
   }
 }
