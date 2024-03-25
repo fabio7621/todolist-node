@@ -1,6 +1,7 @@
 const http = require("http");
-
+const errorHandle = require('./errorHandle')
 const { v4: uuidv4 } = require("uuid");
+const { log } = require("console");
 const todos = [];
 
 const requestListener = (req, res) => {
@@ -21,8 +22,8 @@ const requestListener = (req, res) => {
     res.writeHead(200, headers);
     res.write(
       JSON.stringify({
-        status: "success",
-        data: todos, //插入todos規格
+        "status": "success",
+        "data": todos, //插入todos規格
       })
     );
     res.end();
@@ -39,42 +40,55 @@ const requestListener = (req, res) => {
           res.writeHead(200, headers);
           res.write(
             JSON.stringify({
-              status: "success",
-              data: todos,
+              "status": "success",
+              "data": todos,
             })
           );
           res.end();
         } else {
-          res.writeHead(400, headers);
-          res.write(
-            JSON.stringify({
-              status: "false",
-              message: "欄位未填寫正確",
-            })
-          );
-          res.end();
+         errorHandle(res);
         }
       } catch (error) {
-        console.log(error, "程式錯誤");
-        res.writeHead(400, headers);
-        res.write(
-          JSON.stringify({
-            status: "false",
-            message: "欄位未填寫正確",
-          })
-        );
-        res.end();
+        errorHandle(res);
       }
     });
-  } else if (req.method == "OPTIONS") {
+  }else if (req.url == "/todos" && req.method == "DELETE"){
+    todos.length = 0 ;  //最簡單把陣列清空的方法
+    res.writeHead(200, headers);
+    res.write(
+      JSON.stringify({
+        "status": "success",
+        "data": todos,
+      })
+    );
+    res.end();
+  }else if (req.url.startsWith("/todos/") && req.method == "DELETE"){
+    const id = req.url.split('/').pop();
+    const index = todos.findIndex(element => element.id == id); //找到對應資料索引值
+    if(index!=-1){
+      todos.splice(index,1);
+      res.writeHead(200, headers);
+      res.write(
+        JSON.stringify({
+          "status": "success",
+          "data": todos,
+        })
+      );
+      res.end();
+    }else{
+         errorHandle(res);
+    }
+   
+  }
+   else if (req.method == "OPTIONS") {
     res.writeHead(200, headers);
     res.end();
   } else {
     res.writeHead(404, headers);
     res.write(
       JSON.stringify({
-        status: "false",
-        message: "無此網站路由",
+        "status": "false",
+        "message": "無此網站路由",
       })
     );
     res.end();
